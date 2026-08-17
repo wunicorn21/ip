@@ -6,6 +6,8 @@ public class Ducky {
                 + "| |_| | |_| | (__|   <| |_| |\n"
                 + "|____/ \\__,_|\\___|_|\\_\\\\__, |\n"
                 + "                        |___/ \n";
+        System.out.println("QUACK QUACK!!!! I'M"); //prints the introduction using the banner as the "name"
         System.out.println(banner);
+        System.out.println("OK BAI. OFF TO BUY SOME LEMONADE"); //reference to the duck song
     }
 }
