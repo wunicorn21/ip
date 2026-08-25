@@ -13,12 +13,23 @@ public class Ducky {
 
         // Reads user input line by line, echoing each command back until "bye" is typed.
         Scanner scanner = new Scanner(System.in);
+        String[] chorelist = new String[100];
+        int counter = 0;
         while (true) {
             String input = scanner.nextLine();
 
             if (input.equals("bai")) {
                 break;
             }
+
+            if (input.equals("doWhat")){
+                for (int i = 0; i<counter; i++){
+                    System.out.println(String.valueOf(i+1) + ". "+ chorelist[i]);
+                }
+                continue;
+            }
+            chorelist[counter] = input;
+            counter++;
             System.out.println("QUACKDDING: " + input);
 
         }
