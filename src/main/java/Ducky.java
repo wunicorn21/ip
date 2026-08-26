@@ -13,7 +13,7 @@ public class Ducky {
 
         // Reads user input line by line, echoing each command back until "bye" is typed.
         Scanner scanner = new Scanner(System.in);
-        String[] chorelist = new String[100];
+        chore[] chorelist = new chore[100];
         int counter = 0;
         while (true) {
             String input = scanner.nextLine();
@@ -22,13 +22,29 @@ public class Ducky {
                 break;
             }
 
-            if (input.equals("doWhat")){
+            if (input.equals("list")){
                 for (int i = 0; i<counter; i++){
-                    System.out.println(String.valueOf(i+1) + ". "+ chorelist[i]);
+                    System.out.println("[" + chorelist[i].getStatusIcon() + "] " + String.valueOf(i+1) + ". "+ chorelist[i].getDescription());
                 }
                 continue;
             }
-            chorelist[counter] = input;
+
+            if (input.startsWith("mark")){ //might add array accessing outside of index thing later
+                String filterChoreListRank = input.substring(5).trim();
+                int choreListRankIdx = Integer.parseInt(filterChoreListRank)-1;
+                chorelist[choreListRankIdx].markAsDone();
+                System.out.println ("done quacking " + chorelist[choreListRankIdx].getDescription());
+                continue;
+            }
+
+            if (input.startsWith("unmark")){
+                String filterChoreListRank = input.substring(7).trim();
+                int choreListRankIdx = Integer.parseInt(filterChoreListRank)-1;
+                chorelist[choreListRankIdx].markAsUndone();
+                System.out.println ("oh! actl im not done quaking " + chorelist[choreListRankIdx].getDescription());
+                continue;
+            }
+            chorelist[counter] = new chore(input);
             counter++;
             System.out.println("QUACKDDING: " + input);
 
