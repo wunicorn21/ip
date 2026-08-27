@@ -8,6 +8,9 @@
 /build/
 src/main/resources/docs/
 
+# Compiled class files (build artifacts should not be tracked)
+*.class
+
 # MacOS custom attributes files created by Finder
 .DS_Store
 *.iml
