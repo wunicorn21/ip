@@ -24,6 +24,24 @@ Unless the user says otherwise, assume that you are assisting a student working 
 
 # Project-specific requirements
 
+## Coding standard (mandatory)
+
+All Java code in this repository — new code, edits, and refactors — must follow
+the SE-EDU Java coding standard (Basic + Intermediate levels), documented at
+https://se-education.org/guides/conventions/java/intermediate.html and captured
+in the project skill `seedu-java-coding-standard`
+(`.claude/skills/seedu-java-coding-standard/SKILL.md`).
+
+Invoke that skill before writing or reviewing Java code, and do not propose a
+Java change that violates it. Key points: `PascalCase` class names, `camelCase`
+methods/variables, `UPPER_CASE` constants; 4-space indentation and K&R braces;
+braces around every loop body and conditional branch; explicit (non-wildcard)
+ordered imports; and Javadoc on every public class and non-trivial method.
+
+Project override: comments and Javadoc use **British spelling** (e.g.
+"behaviour", "initialise"), not the American spelling the SE-EDU standard
+specifies.
+
 ## Java version:
 
 Ensure that Java 25 is used when running the application or build tasks. On macOS, use `sdk use java 25.0.3.fx-zulu` to switch to Java 25 if needed.
