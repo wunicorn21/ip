@@ -48,6 +48,17 @@ Ensure that Java 25 is used when running the application or build tasks. On macO
 
 ## Git
 
+Every commit and branch created in this repository must follow the SE-EDU Git
+conventions, documented at https://se-education.org/guides/conventions/git.html
+and captured in the project skill `seedu-git-standard`
+(`.claude/skills/seedu-git-standard/SKILL.md`). Invoke that skill before writing
+any commit message or creating a branch.
+
+Key points: subject line in the imperative mood, capitalized, no trailing
+period, <= 50 chars (72 hard limit); blank line before the body; body wrapped at
+72 chars explaining what and why (not how); one logical change per commit;
+branch names in kebab-case.
+
 Use lightweight tags unless the user requests an annotated tag.
 When proposing or creating a commit message, include enough detail to explain the rationale for the change.
 Do not commit or push unless explicitly asked.
