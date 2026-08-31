@@ -1,9 +1,9 @@
-public class Events extends Chore{
+public class Event extends Chore{
 
     protected String from;
     protected String to;
 
-    public Events(String description, String from, String to) {
+    public Event(String description, String from, String to) {
         super(description);
         this.from = from;
         this.to = to;

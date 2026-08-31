@@ -1,8 +1,8 @@
-public class Deadlines extends Chore{
+public class Deadline extends Chore{
 
     protected String by;
 
-    public Deadlines(String description, String by) {
+    public Deadline(String description, String by) {
         super(description);
         this.by = by;
     }

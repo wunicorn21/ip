@@ -131,7 +131,7 @@ public class Ducky {
         }
         String description = parts[0].trim();
         String by = parts[1].trim();
-        chores[choreCount] = new Deadlines(description, by);
+        chores[choreCount] = new Deadline(description, by);
         printAddedChore(chores[choreCount], choreCount + 1);
         return choreCount + 1;
     }
@@ -161,7 +161,7 @@ public class Ducky {
         }
         String from = timeParts[0].trim();
         String to = timeParts[1].trim();
-        chores[choreCount] = new Events(description, from, to);
+        chores[choreCount] = new Event(description, from, to);
         printAddedChore(chores[choreCount], choreCount + 1);
         return choreCount + 1;
     }
