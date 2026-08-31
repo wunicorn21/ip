@@ -38,6 +38,9 @@ public class Ducky {
                 choreCount = addDeadline(input, chores, choreCount);
             } else if (input.startsWith("event")) {
                 choreCount = addEvent(input, chores, choreCount);
+            } else {
+                System.out.println("QUACK?! I don't know \"" + input + "\". "
+                        + "Try: list, todo, deadline, event, mark, unmark, bai");
             }
         }
 
