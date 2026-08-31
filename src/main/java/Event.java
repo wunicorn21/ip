@@ -15,6 +15,6 @@ public class Event extends Chore{
 
     @Override
     public String getDescription() {
-        return super.getDescription() +"(from: " + from + " to: " + to + ")" ;
+        return super.getDescription() + " (from: " + from + " to: " + to + ")";
     }
 }
