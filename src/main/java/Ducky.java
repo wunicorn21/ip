@@ -77,7 +77,7 @@ public class Ducky {
      * @param chores Array holding the chores.
      */
     private static void markChore(String input, Chore[] chores) {
-        int choreIndex = Integer.parseInt(input.substring(5).trim()) - 1;
+        int choreIndex = Integer.parseInt(input.substring("mark".length()).trim()) - 1;
         chores[choreIndex].markAsDone();
         System.out.println("done quacking " + chores[choreIndex].getDescription());
     }
@@ -89,7 +89,7 @@ public class Ducky {
      * @param chores Array holding the chores.
      */
     private static void unmarkChore(String input, Chore[] chores) {
-        int choreIndex = Integer.parseInt(input.substring(7).trim()) - 1;
+        int choreIndex = Integer.parseInt(input.substring("unmark".length()).trim()) - 1;
         chores[choreIndex].markAsUndone();
         System.out.println("oh! actl im not done quaking "
                 + chores[choreIndex].getDescription());
@@ -104,7 +104,7 @@ public class Ducky {
      * @return The updated chore count.
      */
     private static int addToDo(String input, Chore[] chores, int choreCount) {
-        String description = input.substring(5).trim();
+        String description = input.substring("todo".length()).trim();
         chores[choreCount] = new ToDo(description);
         System.out.println("QUACKDDING: " + chores[choreCount].getDescription());
         return choreCount + 1;
@@ -120,7 +120,7 @@ public class Ducky {
      * @return The updated chore count.
      */
     private static int addDeadline(String input, Chore[] chores, int choreCount) {
-        String rest = input.substring(9).trim();
+        String rest = input.substring("deadline".length()).trim();
         String[] parts = rest.split("/by", 2);
         if (parts.length < 2) {
             System.out.println("QUACK?! A deadline needs a /by, e.g. deadline return book /by Sunday");
@@ -144,7 +144,7 @@ public class Ducky {
      * @return The updated chore count.
      */
     private static int addEvent(String input, Chore[] chores, int choreCount) {
-        String rest = input.substring(6).trim();
+        String rest = input.substring("event".length()).trim();
         String[] parts = rest.split("/from", 2);
         if (parts.length < 2) {
             System.out.println("QUACK?! An event needs a /from, e.g. event meeting /from Mon 2pm /to 4pm");
