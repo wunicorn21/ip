@@ -20,7 +20,13 @@ public class Chore {
         this.isDone = false;
     }
 
-    //to get the different chore type icons
+    /**
+     * Returns the icon marking this chore's type.
+     * The base chore has no specific type, so a "?" placeholder is returned;
+     * subclasses override this with their own single-letter icon.
+     *
+     * @return A one-character type icon.
+     */
     public String getTypeIcon() {
         return "?";
     }
@@ -31,7 +37,6 @@ public class Chore {
      * @return "X" if the chore is done, or a single space otherwise.
      */
     public String getStatusIcon() {
-
         return isDone ? "X" : " ";
     }
 
@@ -53,5 +58,4 @@ public class Chore {
     public void markAsUndone() {
         this.isDone = false;
     }
-
 }
