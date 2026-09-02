@@ -70,13 +70,45 @@ public class Ducky {
     }
 
     /**
+     * Parses the rank following a "mark" or "unmark" keyword and checks that
+     * it refers to an existing chore. Prints an error message and returns -1
+     * if the rank is missing, not a number, or out of range.
+     *
+     * @param input Full command line entered by the user.
+     * @param keyword The command keyword ("mark" or "unmark") preceding the rank.
+     * @param chores The chore list, used to check the rank is in range.
+     * @return The zero-based chore index, or -1 if the rank was invalid.
+     */
+    private static int parseChoreIndex(String input, String keyword, ChoreList chores) {
+        String rankText = input.substring(keyword.length()).trim();
+        int rank;
+        try {
+            rank = Integer.parseInt(rankText);
+        } catch (NumberFormatException e) {
+            System.out.println("QUACK?! \"" + rankText + "\" isn't a chore number.");
+            return -1;
+        }
+        int choreIndex = rank - 1;
+        if (choreIndex < 0 || choreIndex >= chores.size()) {
+            System.out.println("QUACK?! There's no chore number " + rank + ".");
+            return -1;
+        }
+        return choreIndex;
+    }
+
+    /**
      * Marks the chore named by a "mark &lt;rank&gt;" command as done.
+     * If the rank is missing, not a number, or out of range, an error is
+     * printed and nothing is marked.
      *
      * @param input Full command line entered by the user.
      * @param chores The chore list.
      */
     private static void markChore(String input, ChoreList chores) {
-        int choreIndex = Integer.parseInt(input.substring("mark".length()).trim()) - 1;
+        int choreIndex = parseChoreIndex(input, "mark", chores);
+        if (choreIndex == -1) {
+            return;
+        }
         Chore chore = chores.get(choreIndex);
         chore.markAsDone();
         System.out.println("done quacking " + chore.getDescription());
@@ -84,12 +116,17 @@ public class Ducky {
 
     /**
      * Marks the chore named by an "unmark &lt;rank&gt;" command as not done.
+     * If the rank is missing, not a number, or out of range, an error is
+     * printed and nothing is unmarked.
      *
      * @param input Full command line entered by the user.
      * @param chores The chore list.
      */
     private static void unmarkChore(String input, ChoreList chores) {
-        int choreIndex = Integer.parseInt(input.substring("unmark".length()).trim()) - 1;
+        int choreIndex = parseChoreIndex(input, "unmark", chores);
+        if (choreIndex == -1) {
+            return;
+        }
         Chore chore = chores.get(choreIndex);
         chore.markAsUndone();
         System.out.println("oh! actl im not done quaking " + chore.getDescription());
