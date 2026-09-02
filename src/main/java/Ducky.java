@@ -109,7 +109,7 @@ public class Ducky {
     private static int addToDo(String input, Chore[] chores, int choreCount) {
         String description = input.substring("todo".length()).trim();
         chores[choreCount] = new ToDo(description);
-        System.out.println("QUACKDDING: " + chores[choreCount].getDescription());
+        printAddedChore(chores[choreCount], choreCount + 1);
         return choreCount + 1;
     }
 
