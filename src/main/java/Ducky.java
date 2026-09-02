@@ -6,9 +6,6 @@ import java.util.Scanner;
  * the user types "bai".
  */
 public class Ducky {
-    /** Maximum number of chores Ducky can store. */
-    private static final int MAX_CHORES = 100;
-
     /**
      * Runs the Ducky command loop.
      *
@@ -19,25 +16,24 @@ public class Ducky {
 
         // Read user input line by line, dispatching each command until "bai" is typed.
         Scanner scanner = new Scanner(System.in);
-        Chore[] chores = new Chore[MAX_CHORES];
-        int choreCount = 0;
+        ChoreList chores = new ChoreList();
         while (true) {
             String input = scanner.nextLine();
 
             if (input.equals("bai")) {
                 break;
             } else if (input.equals("list")) {
-                printChores(chores, choreCount);
+                printChores(chores);
             } else if (input.startsWith("mark")) {
                 markChore(input, chores);
             } else if (input.startsWith("unmark")) {
                 unmarkChore(input, chores);
             } else if (input.startsWith("todo")) {
-                choreCount = addToDo(input, chores, choreCount);
+                addToDo(input, chores);
             } else if (input.startsWith("deadline")) {
-                choreCount = addDeadline(input, chores, choreCount);
+                addDeadline(input, chores);
             } else if (input.startsWith("event")) {
-                choreCount = addEvent(input, chores, choreCount);
+                addEvent(input, chores);
             } else {
                 System.out.println("QUACK?! I don't know \"" + input + "\". "
                         + "Try: list, todo, deadline, event, mark, unmark, bai");
@@ -63,13 +59,13 @@ public class Ducky {
     /**
      * Prints every stored chore with its type icon, status icon and rank.
      *
-     * @param chores Array holding the chores.
-     * @param choreCount Number of chores currently stored.
+     * @param chores The chore list.
      */
-    private static void printChores(Chore[] chores, int choreCount) {
-        for (int i = 0; i < choreCount; i++) {
-            System.out.println("[" + chores[i].getTypeIcon() + "]" + "[" + chores[i].getStatusIcon() + "] "
-                    + (i + 1) + ". " + chores[i].getDescription());
+    private static void printChores(ChoreList chores) {
+        for (int i = 0; i < chores.size(); i++) {
+            Chore chore = chores.get(i);
+            System.out.println("[" + chore.getTypeIcon() + "]" + "[" + chore.getStatusIcon() + "] "
+                    + (i + 1) + ". " + chore.getDescription());
         }
     }
 
@@ -77,40 +73,39 @@ public class Ducky {
      * Marks the chore named by a "mark &lt;rank&gt;" command as done.
      *
      * @param input Full command line entered by the user.
-     * @param chores Array holding the chores.
+     * @param chores The chore list.
      */
-    private static void markChore(String input, Chore[] chores) {
+    private static void markChore(String input, ChoreList chores) {
         int choreIndex = Integer.parseInt(input.substring("mark".length()).trim()) - 1;
-        chores[choreIndex].markAsDone();
-        System.out.println("done quacking " + chores[choreIndex].getDescription());
+        Chore chore = chores.get(choreIndex);
+        chore.markAsDone();
+        System.out.println("done quacking " + chore.getDescription());
     }
 
     /**
      * Marks the chore named by an "unmark &lt;rank&gt;" command as not done.
      *
      * @param input Full command line entered by the user.
-     * @param chores Array holding the chores.
+     * @param chores The chore list.
      */
-    private static void unmarkChore(String input, Chore[] chores) {
+    private static void unmarkChore(String input, ChoreList chores) {
         int choreIndex = Integer.parseInt(input.substring("unmark".length()).trim()) - 1;
-        chores[choreIndex].markAsUndone();
-        System.out.println("oh! actl im not done quaking "
-                + chores[choreIndex].getDescription());
+        Chore chore = chores.get(choreIndex);
+        chore.markAsUndone();
+        System.out.println("oh! actl im not done quaking " + chore.getDescription());
     }
 
     /**
      * Adds a to-do chore described by a "todo &lt;description&gt;" command.
      *
      * @param input Full command line entered by the user.
-     * @param chores Array holding the chores.
-     * @param choreCount Number of chores stored before this call.
-     * @return The updated chore count.
+     * @param chores The chore list.
      */
-    private static int addToDo(String input, Chore[] chores, int choreCount) {
+    private static void addToDo(String input, ChoreList chores) {
         String description = input.substring("todo".length()).trim();
-        chores[choreCount] = new ToDo(description);
-        printAddedChore(chores[choreCount], choreCount + 1);
-        return choreCount + 1;
+        Chore chore = new ToDo(description);
+        chores.add(chore);
+        printAddedChore(chore, chores.size());
     }
 
     /**
@@ -118,22 +113,20 @@ public class Ducky {
      * If the "/by" separator is missing, an error is printed and nothing is added.
      *
      * @param input Full command line entered by the user.
-     * @param chores Array holding the chores.
-     * @param choreCount Number of chores stored before this call.
-     * @return The updated chore count.
+     * @param chores The chore list.
      */
-    private static int addDeadline(String input, Chore[] chores, int choreCount) {
+    private static void addDeadline(String input, ChoreList chores) {
         String rest = input.substring("deadline".length()).trim();
         String[] parts = rest.split("/by", 2);
         if (parts.length < 2) {
             System.out.println("QUACK?! A deadline needs a /by, e.g. deadline return book /by Sunday");
-            return choreCount;
+            return;
         }
         String description = parts[0].trim();
         String by = parts[1].trim();
-        chores[choreCount] = new Deadline(description, by);
-        printAddedChore(chores[choreCount], choreCount + 1);
-        return choreCount + 1;
+        Chore chore = new Deadline(description, by);
+        chores.add(chore);
+        printAddedChore(chore, chores.size());
     }
 
     /**
@@ -142,32 +135,30 @@ public class Ducky {
      * If the "/from" or "/to" separator is missing, an error is printed and nothing is added.
      *
      * @param input Full command line entered by the user.
-     * @param chores Array holding the chores.
-     * @param choreCount Number of chores stored before this call.
-     * @return The updated chore count.
+     * @param chores The chore list.
      */
-    private static int addEvent(String input, Chore[] chores, int choreCount) {
+    private static void addEvent(String input, ChoreList chores) {
         String rest = input.substring("event".length()).trim();
         String[] parts = rest.split("/from", 2);
         if (parts.length < 2) {
             System.out.println("QUACK?! An event needs a /from, e.g. event meeting /from Mon 2pm /to 4pm");
-            return choreCount;
+            return;
         }
         String description = parts[0].trim();
         String[] timeParts = parts[1].split("/to", 2);
         if (timeParts.length < 2) {
             System.out.println("QUACK?! An event needs a /to, e.g. event meeting /from Mon 2pm /to 4pm");
-            return choreCount;
+            return;
         }
         String from = timeParts[0].trim();
         String to = timeParts[1].trim();
-        chores[choreCount] = new Event(description, from, to);
-        printAddedChore(chores[choreCount], choreCount + 1);
-        return choreCount + 1;
+        Chore chore = new Event(description, from, to);
+        chores.add(chore);
+        printAddedChore(chore, chores.size());
     }
 
     /**
-     * Prints the confirmation shown after a deadline or event chore is added.
+     * Prints the confirmation shown after a chore is added.
      *
      * @param added The chore that was just added.
      * @param choreCount Number of chores stored after the addition.
