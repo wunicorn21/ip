@@ -134,12 +134,17 @@ public class Ducky {
 
     /**
      * Adds a to-do chore described by a "todo &lt;description&gt;" command.
+     * If the description is missing, an error is printed and nothing is added.
      *
      * @param input Full command line entered by the user.
      * @param chores The chore list.
      */
     private static void addToDo(String input, ChoreList chores) {
         String description = input.substring("todo".length()).trim();
+        if (description.isEmpty()) {
+            System.out.println("QUACK?! A todo needs a description, e.g. todo read book");
+            return;
+        }
         Chore chore = new ToDo(description);
         chores.add(chore);
         printAddedChore(chore, chores.size());
