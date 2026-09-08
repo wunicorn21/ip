@@ -152,7 +152,8 @@ public class Ducky {
 
     /**
      * Adds a deadline chore described by a "deadline &lt;description&gt; /by &lt;when&gt;" command.
-     * If the "/by" separator is missing, an error is printed and nothing is added.
+     * If the "/by" separator, the description or the due time is missing, an
+     * error is printed and nothing is added.
      *
      * @param input Full command line entered by the user.
      * @param chores The chore list.
@@ -166,6 +167,14 @@ public class Ducky {
         }
         String description = parts[0].trim();
         String by = parts[1].trim();
+        if (description.isEmpty()) {
+            System.out.println("QUACK?! A deadline needs a description, e.g. deadline return book /by Sunday");
+            return;
+        }
+        if (by.isEmpty()) {
+            System.out.println("QUACK?! A deadline needs a time after /by, e.g. deadline return book /by Sunday");
+            return;
+        }
         Chore chore = new Deadline(description, by);
         chores.add(chore);
         printAddedChore(chore, chores.size());
