@@ -1,3 +1,5 @@
+package ducky.chore;
+
 /**
  * Represents a to-do: a chore with only a description and no attached date.
  */

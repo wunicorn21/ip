@@ -1,3 +1,5 @@
+package ducky.chore;
+
 /**
  * Represents an event: a chore that spans a period from a start time to an end time.
  */
