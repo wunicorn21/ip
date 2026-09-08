@@ -1,3 +1,5 @@
+package ducky.chore;
+
 /**
  * Represents a deadline: a chore that must be done by a certain time.
  */

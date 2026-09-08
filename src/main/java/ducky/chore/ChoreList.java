@@ -1,3 +1,5 @@
+package ducky.chore;
+
 import java.util.ArrayList;
 import java.util.List;
 

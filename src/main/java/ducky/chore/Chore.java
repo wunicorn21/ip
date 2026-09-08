@@ -1,3 +1,5 @@
+package ducky.chore;
+
 /**
  * Represents a single chore (task) tracked by Ducky.
  * A chore has a text description and a completion status.

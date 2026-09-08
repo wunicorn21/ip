@@ -1,5 +1,11 @@
 import java.util.Scanner;
 
+import ducky.chore.Chore;
+import ducky.chore.ChoreList;
+import ducky.chore.Deadline;
+import ducky.chore.Event;
+import ducky.chore.ToDo;
+
 /**
  * Entry point for the Ducky task manager.
  * Ducky reads commands from standard input and manages a list of chores until
