@@ -134,12 +134,17 @@ public class Ducky {
 
     /**
      * Adds a to-do chore described by a "todo &lt;description&gt;" command.
+     * If the description is missing, an error is printed and nothing is added.
      *
      * @param input Full command line entered by the user.
      * @param chores The chore list.
      */
     private static void addToDo(String input, ChoreList chores) {
         String description = input.substring("todo".length()).trim();
+        if (description.isEmpty()) {
+            System.out.println("QUACK?! A todo needs a description, e.g. todo read book");
+            return;
+        }
         Chore chore = new ToDo(description);
         chores.add(chore);
         printAddedChore(chore, chores.size());
@@ -147,7 +152,8 @@ public class Ducky {
 
     /**
      * Adds a deadline chore described by a "deadline &lt;description&gt; /by &lt;when&gt;" command.
-     * If the "/by" separator is missing, an error is printed and nothing is added.
+     * If the "/by" separator, the description or the due time is missing, an
+     * error is printed and nothing is added.
      *
      * @param input Full command line entered by the user.
      * @param chores The chore list.
@@ -161,6 +167,14 @@ public class Ducky {
         }
         String description = parts[0].trim();
         String by = parts[1].trim();
+        if (description.isEmpty()) {
+            System.out.println("QUACK?! A deadline needs a description, e.g. deadline return book /by Sunday");
+            return;
+        }
+        if (by.isEmpty()) {
+            System.out.println("QUACK?! A deadline needs a time after /by, e.g. deadline return book /by Sunday");
+            return;
+        }
         Chore chore = new Deadline(description, by);
         chores.add(chore);
         printAddedChore(chore, chores.size());
@@ -169,7 +183,8 @@ public class Ducky {
     /**
      * Adds an event chore described by an
      * "event &lt;description&gt; /from &lt;start&gt; /to &lt;end&gt;" command.
-     * If the "/from" or "/to" separator is missing, an error is printed and nothing is added.
+     * If the "/from" or "/to" separator, the description, the start time or
+     * the end time is missing, an error is printed and nothing is added.
      *
      * @param input Full command line entered by the user.
      * @param chores The chore list.
@@ -182,6 +197,10 @@ public class Ducky {
             return;
         }
         String description = parts[0].trim();
+        if (description.isEmpty()) {
+            System.out.println("QUACK?! An event needs a description, e.g. event meeting /from Mon 2pm /to 4pm");
+            return;
+        }
         String[] timeParts = parts[1].split("/to", 2);
         if (timeParts.length < 2) {
             System.out.println("QUACK?! An event needs a /to, e.g. event meeting /from Mon 2pm /to 4pm");
@@ -189,6 +208,16 @@ public class Ducky {
         }
         String from = timeParts[0].trim();
         String to = timeParts[1].trim();
+        if (from.isEmpty()) {
+            System.out.println("QUACK?! An event needs a start time after /from, "
+                    + "e.g. event meeting /from Mon 2pm /to 4pm");
+            return;
+        }
+        if (to.isEmpty()) {
+            System.out.println("QUACK?! An event needs an end time after /to, "
+                    + "e.g. event meeting /from Mon 2pm /to 4pm");
+            return;
+        }
         Chore chore = new Event(description, from, to);
         chores.add(chore);
         printAddedChore(chore, chores.size());
