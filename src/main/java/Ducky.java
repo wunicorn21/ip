@@ -34,6 +34,8 @@ public class Ducky {
                 markChore(input, chores);
             } else if (input.startsWith("unmark")) {
                 unmarkChore(input, chores);
+            } else if (input.startsWith("delete")) {
+                deleteChore(input, chores);
             } else if (input.startsWith("todo")) {
                 addToDo(input, chores);
             } else if (input.startsWith("deadline")) {
@@ -42,7 +44,7 @@ public class Ducky {
                 addEvent(input, chores);
             } else {
                 System.out.println("QUACK?! I don't know \"" + input + "\". "
-                        + "Try: list, todo, deadline, event, mark, unmark, bai");
+                        + "Try: list, todo, deadline, event, mark, unmark, delete, bai");
             }
         }
 
@@ -136,6 +138,32 @@ public class Ducky {
         Chore chore = chores.get(choreIndex);
         chore.markAsUndone();
         System.out.println("oh! actl im not done quaking " + chore.getDescription());
+    }
+
+    /**
+     * Deletes the chore named by a "delete &lt;rank&gt;" command.
+     * If the rank is missing, not a number, or out of range, an error is
+     * printed and nothing is deleted. Otherwise the deleted chore is
+     * announced (using the rank it had before deletion) and the updated
+     * chore list, now renumbered with no gaps, is printed.
+     *
+     * @param input Full command line entered by the user.
+     * @param chores The chore list.
+     */
+    private static void deleteChore(String input, ChoreList chores) {
+        int choreIndex = parseChoreIndex(input, "delete", chores);
+        if (choreIndex == -1) {
+            return;
+        }
+        int rank = choreIndex + 1;
+        Chore deleted = chores.get(choreIndex);
+        String deletedLine = "[" + deleted.getTypeIcon() + "][" + deleted.getStatusIcon() + "] "
+                + rank + ". " + deleted.getDescription();
+        chores.remove(choreIndex);
+        System.out.println(deletedLine + " waddled away!");
+        System.out.println("Now chorelist is:");
+        printChores(chores);
+        System.out.println("Now you have " + chores.size() + " chores in the list.");
     }
 
     /**

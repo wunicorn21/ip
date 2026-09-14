@@ -31,6 +31,17 @@ public class ChoreList {
     }
 
     /**
+     * Removes and returns the chore at the given zero-based index.
+     * Chores after it shift down by one position to close the gap.
+     *
+     * @param index Zero-based position of the chore to remove.
+     * @return The chore that was removed.
+     */
+    public Chore remove(int index) {
+        return chores.remove(index);
+    }
+
+    /**
      * Returns how many chores are currently stored.
      *
      * @return The number of chores.
