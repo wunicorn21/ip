@@ -40,7 +40,7 @@ public class Ducky {
             } else if (input.startsWith("unmark")) {
                 unmarkChore(input, chores, storage);
             } else if (input.startsWith("delete")) {
-                deleteChore(input, chores);
+                deleteChore(input, chores, storage);
             } else if (input.startsWith("todo")) {
                 addToDo(input, chores, storage);
             } else if (input.startsWith("deadline")) {
@@ -196,7 +196,7 @@ public class Ducky {
      * @param input Full command line entered by the user.
      * @param chores The chore list.
      */
-    private static void deleteChore(String input, ChoreList chores) {
+    private static void deleteChore(String input, ChoreList chores, Storage storage) {
         int choreIndex = parseChoreIndex(input, "delete", chores);
         if (choreIndex == -1) {
             return;
@@ -210,6 +210,7 @@ public class Ducky {
         System.out.println("Now chorelist is:");
         printChores(chores);
         System.out.println("Now you have " + chores.size() + " chores in the list.");
+        saveChores(chores, storage);
     }
 
     /**
