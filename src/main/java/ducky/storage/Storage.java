@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -49,7 +51,12 @@ public class Storage {
             return chores;
         }
         for (String line : Files.readAllLines(DATA_FILE_PATH)) {
-            chores.add(parseChore(line));
+            try {
+                chores.add(parseChore(line));
+            } catch (DateTimeParseException e) {
+                // Reported as an IOException so the caller handles it like any other unreadable save file.
+                throw new IOException("bad date in saved line \"" + line + "\"", e);
+            }
         }
         return chores;
     }
@@ -89,6 +96,7 @@ public class Storage {
      *
      * @param line One save-file line.
      * @return The chore the line represents.
+     * @throws DateTimeParseException If a deadline's saved date cannot be read.
      */
     private Chore parseChore(String line) {
         Matcher lineMatcher = LINE_PATTERN.matcher(line);
@@ -112,13 +120,16 @@ public class Storage {
      * @param typeIcon Single-letter type icon ("T", "D" or "E").
      * @param description The rendered description, as written by {@link #formatChore}.
      * @return The reconstructed chore.
+     * @throws DateTimeParseException If a deadline's saved date cannot be read.
      */
     private Chore buildChore(String typeIcon, String description) {
         switch (typeIcon) {
         case "D":
             Matcher deadlineMatcher = DEADLINE_PATTERN.matcher(description);
             deadlineMatcher.matches();
-            return new Deadline(deadlineMatcher.group(1), deadlineMatcher.group(2));
+            // The date was saved in the same format it is displayed in, so read it back with that format.
+            LocalDate by = LocalDate.parse(deadlineMatcher.group(2), Deadline.DISPLAY_FORMAT);
+            return new Deadline(deadlineMatcher.group(1), by);
         case "E":
             Matcher eventMatcher = EVENT_PATTERN.matcher(description);
             eventMatcher.matches();
