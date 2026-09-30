@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.util.Scanner;
 
 import ducky.chore.Chore;
 import ducky.chore.ChoreList;
@@ -7,6 +6,7 @@ import ducky.chore.Deadline;
 import ducky.chore.Event;
 import ducky.chore.ToDo;
 import ducky.storage.Storage;
+import ducky.ui.Ui;
 
 
 /**
@@ -21,40 +21,40 @@ public class Ducky {
      * @param args Command line arguments (not used).
      */
     public static void main(String[] args) {
-        printIntroduction();
+        Ui ui = new Ui();
+        ui.showWelcome();
 
         Storage storage = new Storage();
-        ChoreList chores = loadChores(storage);
+        ChoreList chores = loadChores(storage, ui);
 
         // Read user input line by line, dispatching each command until "bai" is typed.
-        Scanner scanner = new Scanner(System.in);
         while (true) {
-            String input = scanner.nextLine();
+            String input = ui.readCommand();
 
             if (input.equals("bai")) {
                 break;
             } else if (input.equals("list")) {
-                printChores(chores);
+                ui.showChores(chores);
             } else if (input.startsWith("mark")) {
-                markChore(input, chores, storage);
+                markChore(input, chores, storage, ui);
             } else if (input.startsWith("unmark")) {
-                unmarkChore(input, chores, storage);
+                unmarkChore(input, chores, storage, ui);
             } else if (input.startsWith("delete")) {
-                deleteChore(input, chores, storage);
+                deleteChore(input, chores, storage, ui);
             } else if (input.startsWith("todo")) {
-                addToDo(input, chores, storage);
+                addToDo(input, chores, storage, ui);
             } else if (input.startsWith("deadline")) {
-                addDeadline(input, chores, storage);
+                addDeadline(input, chores, storage, ui);
             } else if (input.startsWith("event")) {
-                addEvent(input, chores, storage);
+                addEvent(input, chores, storage, ui);
             } else {
-                System.out.println("QUACK?! I don't know \"" + input + "\". "
+                ui.showMessage("QUACK?! I don't know \"" + input + "\". "
                         + "Try: list, todo, deadline, event, mark, unmark, delete, bai");
             }
         }
 
-        System.out.println("OK BAI. OFF TO BUY SOME LEMONADE"); // reference to the duck song
-        scanner.close();
+        ui.showGoodbye();
+        ui.close();
     }
 
     /**
@@ -63,16 +63,17 @@ public class Ducky {
      * with an empty chore list instead of failing.
      *
      * @param storage The storage used to read the save file.
+     * @param ui The ui used to report a loading error, if any.
      * @return A chore list containing whatever was loaded (possibly empty).
      */
-    private static ChoreList loadChores(Storage storage) {
+    private static ChoreList loadChores(Storage storage, Ui ui) {
         ChoreList chores = new ChoreList();
         try {
             for (Chore chore : storage.load()) {
                 chores.add(chore);
             }
         } catch (IOException e) {
-            System.out.println("QUACK?! Couldn't read saved chores, starting with an empty list: " + e.getMessage());
+            ui.showMessage("QUACK?! Couldn't read saved chores, starting with an empty list: " + e.getMessage());
         }
         return chores;
     }
@@ -85,37 +86,13 @@ public class Ducky {
      *
      * @param chores The chore list to save.
      * @param storage The storage used to write the save file.
+     * @param ui The ui used to report a saving error, if any.
      */
-    private static void saveChores(ChoreList chores, Storage storage) {
+    private static void saveChores(ChoreList chores, Storage storage, Ui ui) {
         try {
             storage.save(chores);
         } catch (IOException e) {
-            System.out.println("QUACK?! Couldn't save chores: " + e.getMessage());
-        }
-    }
-
-    /** Prints Ducky's greeting and name banner. */
-    private static void printIntroduction() {
-        String banner = " ____             _          \n"
-                + "|  _ \\ _   _  ___| | ___   _ \n"
-                + "| | | | | | |/ __| |/ / | | |\n"
-                + "| |_| | |_| | (__|   <| |_| |\n"
-                + "|____/ \\__,_|\\___|_|\\_\\\\__, |\n"
-                + "                        |___/ \n";
-        System.out.println("QUACK QUACK!!!! I'M");
-        System.out.println(banner);
-    }
-
-    /**
-     * Prints every stored chore with its type icon, status icon and rank.
-     *
-     * @param chores The chore list.
-     */
-    private static void printChores(ChoreList chores) {
-        for (int i = 0; i < chores.size(); i++) {
-            Chore chore = chores.get(i);
-            System.out.println("[" + chore.getTypeIcon() + "]" + "[" + chore.getStatusIcon() + "] "
-                    + (i + 1) + ". " + chore.getDescription());
+            ui.showMessage("QUACK?! Couldn't save chores: " + e.getMessage());
         }
     }
 
@@ -127,20 +104,21 @@ public class Ducky {
      * @param input Full command line entered by the user.
      * @param keyword The command keyword ("mark" or "unmark") preceding the rank.
      * @param chores The chore list, used to check the rank is in range.
+     * @param ui The ui used to report an invalid rank, if any.
      * @return The zero-based chore index, or -1 if the rank was invalid.
      */
-    private static int parseChoreIndex(String input, String keyword, ChoreList chores) {
+    private static int parseChoreIndex(String input, String keyword, ChoreList chores, Ui ui) {
         String rankText = input.substring(keyword.length()).trim();
         int rank;
         try {
             rank = Integer.parseInt(rankText);
         } catch (NumberFormatException e) {
-            System.out.println("QUACK?! \"" + rankText + "\" isn't a chore number.");
+            ui.showMessage("QUACK?! \"" + rankText + "\" isn't a chore number.");
             return -1;
         }
         int choreIndex = rank - 1;
         if (choreIndex < 0 || choreIndex >= chores.size()) {
-            System.out.println("QUACK?! There's no chore number " + rank + ".");
+            ui.showMessage("QUACK?! There's no chore number " + rank + ".");
             return -1;
         }
         return choreIndex;
@@ -154,16 +132,17 @@ public class Ducky {
      * @param input Full command line entered by the user.
      * @param chores The chore list.
      * @param storage The storage used to persist the change.
+     * @param ui The ui used to print the confirmation or error message.
      */
-    private static void markChore(String input, ChoreList chores, Storage storage) {
-        int choreIndex = parseChoreIndex(input, "mark", chores);
+    private static void markChore(String input, ChoreList chores, Storage storage, Ui ui) {
+        int choreIndex = parseChoreIndex(input, "mark", chores, ui);
         if (choreIndex == -1) {
             return;
         }
         Chore chore = chores.get(choreIndex);
         chore.markAsDone();
-        saveChores(chores, storage);
-        System.out.println("done quacking " + chore.getDescription());
+        saveChores(chores, storage, ui);
+        ui.showMessage("done quacking " + chore.getDescription());
     }
 
     /**
@@ -174,16 +153,17 @@ public class Ducky {
      * @param input Full command line entered by the user.
      * @param chores The chore list.
      * @param storage The storage used to persist the change.
+     * @param ui The ui used to print the confirmation or error message.
      */
-    private static void unmarkChore(String input, ChoreList chores, Storage storage) {
-        int choreIndex = parseChoreIndex(input, "unmark", chores);
+    private static void unmarkChore(String input, ChoreList chores, Storage storage, Ui ui) {
+        int choreIndex = parseChoreIndex(input, "unmark", chores, ui);
         if (choreIndex == -1) {
             return;
         }
         Chore chore = chores.get(choreIndex);
         chore.markAsUndone();
-        saveChores(chores, storage);
-        System.out.println("oh! actl im not done quaking " + chore.getDescription());
+        saveChores(chores, storage, ui);
+        ui.showMessage("oh! actl im not done quaking " + chore.getDescription());
     }
 
     /**
@@ -195,9 +175,11 @@ public class Ducky {
      *
      * @param input Full command line entered by the user.
      * @param chores The chore list.
+     * @param storage The storage used to persist the change.
+     * @param ui The ui used to print the confirmation, updated list, or error message.
      */
-    private static void deleteChore(String input, ChoreList chores, Storage storage) {
-        int choreIndex = parseChoreIndex(input, "delete", chores);
+    private static void deleteChore(String input, ChoreList chores, Storage storage, Ui ui) {
+        int choreIndex = parseChoreIndex(input, "delete", chores, ui);
         if (choreIndex == -1) {
             return;
         }
@@ -206,11 +188,11 @@ public class Ducky {
         String deletedLine = "[" + deleted.getTypeIcon() + "][" + deleted.getStatusIcon() + "] "
                 + rank + ". " + deleted.getDescription();
         chores.remove(choreIndex);
-        System.out.println(deletedLine + " waddled away!");
-        System.out.println("Now chorelist is:");
-        printChores(chores);
-        System.out.println("Now you have " + chores.size() + " chores in the list.");
-        saveChores(chores, storage);
+        ui.showMessage(deletedLine + " waddled away!");
+        ui.showMessage("Now chorelist is:");
+        ui.showChores(chores);
+        ui.showMessage("Now you have " + chores.size() + " chores in the list.");
+        saveChores(chores, storage, ui);
     }
 
     /**
@@ -220,17 +202,18 @@ public class Ducky {
      * @param input Full command line entered by the user.
      * @param chores The chore list.
      * @param storage The storage used to persist the change.
+     * @param ui The ui used to print the confirmation or error message.
      */
-    private static void addToDo(String input, ChoreList chores, Storage storage) {
+    private static void addToDo(String input, ChoreList chores, Storage storage, Ui ui) {
         String description = input.substring("todo".length()).trim();
         if (description.isEmpty()) {
-            System.out.println("QUACK?! A todo needs a description, e.g. todo read book");
+            ui.showMessage("QUACK?! A todo needs a description, e.g. todo read book");
             return;
         }
         Chore chore = new ToDo(description);
         chores.add(chore);
-        saveChores(chores, storage);
-        printAddedChore(chore, chores.size());
+        saveChores(chores, storage, ui);
+        printAddedChore(chore, chores.size(), ui);
     }
 
     /**
@@ -241,28 +224,29 @@ public class Ducky {
      * @param input Full command line entered by the user.
      * @param chores The chore list.
      * @param storage The storage used to persist the change.
+     * @param ui The ui used to print the confirmation or error message.
      */
-    private static void addDeadline(String input, ChoreList chores, Storage storage) {
+    private static void addDeadline(String input, ChoreList chores, Storage storage, Ui ui) {
         String rest = input.substring("deadline".length()).trim();
         String[] parts = rest.split("/by", 2);
         if (parts.length < 2) {
-            System.out.println("QUACK?! A deadline needs a /by, e.g. deadline return book /by Sunday");
+            ui.showMessage("QUACK?! A deadline needs a /by, e.g. deadline return book /by Sunday");
             return;
         }
         String description = parts[0].trim();
         String by = parts[1].trim();
         if (description.isEmpty()) {
-            System.out.println("QUACK?! A deadline needs a description, e.g. deadline return book /by Sunday");
+            ui.showMessage("QUACK?! A deadline needs a description, e.g. deadline return book /by Sunday");
             return;
         }
         if (by.isEmpty()) {
-            System.out.println("QUACK?! A deadline needs a time after /by, e.g. deadline return book /by Sunday");
+            ui.showMessage("QUACK?! A deadline needs a time after /by, e.g. deadline return book /by Sunday");
             return;
         }
         Chore chore = new Deadline(description, by);
         chores.add(chore);
-        saveChores(chores, storage);
-        printAddedChore(chore, chores.size());
+        saveChores(chores, storage, ui);
+        printAddedChore(chore, chores.size(), ui);
     }
 
     /**
@@ -274,40 +258,41 @@ public class Ducky {
      * @param input Full command line entered by the user.
      * @param chores The chore list.
      * @param storage The storage used to persist the change.
+     * @param ui The ui used to print the confirmation or error message.
      */
-    private static void addEvent(String input, ChoreList chores, Storage storage) {
+    private static void addEvent(String input, ChoreList chores, Storage storage, Ui ui) {
         String rest = input.substring("event".length()).trim();
         String[] parts = rest.split("/from", 2);
         if (parts.length < 2) {
-            System.out.println("QUACK?! An event needs a /from, e.g. event meeting /from Mon 2pm /to 4pm");
+            ui.showMessage("QUACK?! An event needs a /from, e.g. event meeting /from Mon 2pm /to 4pm");
             return;
         }
         String description = parts[0].trim();
         if (description.isEmpty()) {
-            System.out.println("QUACK?! An event needs a description, e.g. event meeting /from Mon 2pm /to 4pm");
+            ui.showMessage("QUACK?! An event needs a description, e.g. event meeting /from Mon 2pm /to 4pm");
             return;
         }
         String[] timeParts = parts[1].split("/to", 2);
         if (timeParts.length < 2) {
-            System.out.println("QUACK?! An event needs a /to, e.g. event meeting /from Mon 2pm /to 4pm");
+            ui.showMessage("QUACK?! An event needs a /to, e.g. event meeting /from Mon 2pm /to 4pm");
             return;
         }
         String from = timeParts[0].trim();
         String to = timeParts[1].trim();
         if (from.isEmpty()) {
-            System.out.println("QUACK?! An event needs a start time after /from, "
+            ui.showMessage("QUACK?! An event needs a start time after /from, "
                     + "e.g. event meeting /from Mon 2pm /to 4pm");
             return;
         }
         if (to.isEmpty()) {
-            System.out.println("QUACK?! An event needs an end time after /to, "
+            ui.showMessage("QUACK?! An event needs an end time after /to, "
                     + "e.g. event meeting /from Mon 2pm /to 4pm");
             return;
         }
         Chore chore = new Event(description, from, to);
         chores.add(chore);
-        saveChores(chores, storage);
-        printAddedChore(chore, chores.size());
+        saveChores(chores, storage, ui);
+        printAddedChore(chore, chores.size(), ui);
     }
 
     /**
@@ -315,10 +300,11 @@ public class Ducky {
      *
      * @param added The chore that was just added.
      * @param choreCount Number of chores stored after the addition.
+     * @param ui The ui used to print the confirmation.
      */
-    private static void printAddedChore(Chore added, int choreCount) {
-        System.out.println("QUACKDDING! I've added this chore:");
-        System.out.println("  [" + added.getTypeIcon() + "][" + added.getStatusIcon() + "] " + added.getDescription());
-        System.out.println("Now you have " + choreCount + " chores in the list.");
+    private static void printAddedChore(Chore added, int choreCount, Ui ui) {
+        ui.showMessage("QUACKDDING! I've added this chore:");
+        ui.showMessage("  [" + added.getTypeIcon() + "][" + added.getStatusIcon() + "] " + added.getDescription());
+        ui.showMessage("Now you have " + choreCount + " chores in the list.");
     }
 }
