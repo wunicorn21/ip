@@ -47,7 +47,7 @@ Example: `deadline return book /by 15-10-2026`
 
 ```
 QUACKDDING! I've added this chore:
-  [D][ ] return book (by: 15-10-2026)
+  [D][ ] return book (by: 15 Oct 2026)
 Now you have 2 chores in the list.
 ```
 
@@ -73,7 +73,7 @@ Format: `list`
 
 ```
 [T][ ] 1. read book
-[D][ ] 2. return book (by: 15-10-2026)
+[D][ ] 2. return book (by: 15 Oct 2026)
 [E][ ] 3. project meeting (from: Mon 2pm to: 4pm)
 ```
 
@@ -115,7 +115,7 @@ Example: `delete 3`
 [E][ ] 3. project meeting (from: Mon 2pm to: 4pm) waddled away!
 Now chorelist is:
 [T][ ] 1. read book
-[D][ ] 2. return book (by: 15-10-2026)
+[D][ ] 2. return book (by: 15 Oct 2026)
 Now you have 2 chores in the list.
 ```
 
@@ -130,7 +130,7 @@ Example: `find book`
 ```
 Here are the matching chores in your list:
 [T][ ] 1. read book
-[D][ ] 2. return book (by: 15-10-2026)
+[D][ ] 2. return book (by: 15 Oct 2026)
 ```
 
 ### Exiting: `bai`

@@ -150,16 +150,22 @@ public class Storage {
 
     /**
      * Parses a deadline's saved date. Dates are saved in
-     * {@link Deadline#DATE_FORMAT}, but save files written by older versions
-     * of Ducky use {@link #LEGACY_DATE_FORMAT}, so that is tried as a fallback.
+     * {@link Deadline#DISPLAY_DATE_FORMAT}, but save files written by older
+     * versions of Ducky use {@link Deadline#INPUT_DATE_FORMAT} or
+     * {@link #LEGACY_DATE_FORMAT}, so those are tried as fallbacks.
      *
      * @param dateText The saved date text.
      * @return The date the text describes.
-     * @throws DateTimeParseException If the text matches neither format.
+     * @throws DateTimeParseException If the text matches none of the formats.
      */
     private LocalDate parseSavedDate(String dateText) {
         try {
-            return LocalDate.parse(dateText, Deadline.DATE_FORMAT);
+            return LocalDate.parse(dateText, Deadline.DISPLAY_DATE_FORMAT);
+        } catch (DateTimeParseException e) {
+            // Not the current format; fall through to the older ones.
+        }
+        try {
+            return LocalDate.parse(dateText, Deadline.INPUT_DATE_FORMAT);
         } catch (DateTimeParseException e) {
             return LocalDate.parse(dateText, LEGACY_DATE_FORMAT);
         }

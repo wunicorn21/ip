@@ -147,8 +147,8 @@ public class Parser {
      */
     private static LocalDate parseDate(String dateText) throws DuckyException {
         try {
-            // Deadline.DATE_FORMAT resolves strictly, so impossible dates like 30-02-2019 are rejected.
-            return LocalDate.parse(dateText, Deadline.DATE_FORMAT);
+            // INPUT_DATE_FORMAT resolves strictly, so impossible dates like 30-02-2019 are rejected.
+            return LocalDate.parse(dateText, Deadline.INPUT_DATE_FORMAT);
         } catch (DateTimeParseException e) {
             throw new DuckyException("QUACK?! \"" + dateText + "\" isn't a date I understand. "
                     + "Use dd-mm-yyyy, e.g. 15-10-2019");
