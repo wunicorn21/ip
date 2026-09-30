@@ -5,9 +5,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +38,14 @@ public class Storage {
 
     /** Matches an event's rendered description: "description (from: start to: end)". */
     private static final Pattern EVENT_PATTERN = Pattern.compile("^(.*) \\(from: (.*) to: (.*)\\)$");
+
+    /**
+     * Date format used by older versions of Ducky, e.g. "Oct 15 2019", kept
+     * only so their save files still load. The locale is fixed to English so
+     * month names are read the same on every machine.
+     */
+    private static final DateTimeFormatter LEGACY_DATE_FORMAT =
+            DateTimeFormatter.ofPattern("MMM d yyyy", Locale.ENGLISH);
 
     /**
      * Loads the chores previously saved to disk.
@@ -127,8 +137,7 @@ public class Storage {
         case "D":
             Matcher deadlineMatcher = DEADLINE_PATTERN.matcher(description);
             deadlineMatcher.matches();
-            // The date was saved in the same format it is displayed in, so read it back with that format.
-            LocalDate by = LocalDate.parse(deadlineMatcher.group(2), Deadline.DISPLAY_FORMAT);
+            LocalDate by = parseSavedDate(deadlineMatcher.group(2));
             return new Deadline(deadlineMatcher.group(1), by);
         case "E":
             Matcher eventMatcher = EVENT_PATTERN.matcher(description);
@@ -136,6 +145,23 @@ public class Storage {
             return new Event(eventMatcher.group(1), eventMatcher.group(2), eventMatcher.group(3));
         default:
             return new ToDo(description);
+        }
+    }
+
+    /**
+     * Parses a deadline's saved date. Dates are saved in
+     * {@link Deadline#DATE_FORMAT}, but save files written by older versions
+     * of Ducky use {@link #LEGACY_DATE_FORMAT}, so that is tried as a fallback.
+     *
+     * @param dateText The saved date text.
+     * @return The date the text describes.
+     * @throws DateTimeParseException If the text matches neither format.
+     */
+    private LocalDate parseSavedDate(String dateText) {
+        try {
+            return LocalDate.parse(dateText, Deadline.DATE_FORMAT);
+        } catch (DateTimeParseException e) {
+            return LocalDate.parse(dateText, LEGACY_DATE_FORMAT);
         }
     }
 }

@@ -112,46 +112,46 @@ public class Parser {
     }
 
     /**
-     * Parses a deadline chore from a "deadline &lt;description&gt; /by &lt;yyyy-mm-dd&gt;" command.
+     * Parses a deadline chore from a "deadline &lt;description&gt; /by &lt;dd-mm-yyyy&gt;" command.
      *
      * @param input Full command line entered by the user.
      * @return The deadline chore described by the command.
      * @throws DuckyException If the "/by" separator, the description or the due date is missing,
-     *         or the due date is not a valid date in yyyy-mm-dd form.
+     *         or the due date is not a valid date in dd-mm-yyyy form.
      */
     private static Chore parseDeadline(String input) throws DuckyException {
         String rest = input.substring("deadline".length()).trim();
         String[] parts = rest.split("/by", 2);
         if (parts.length < 2) {
-            throw new DuckyException("QUACK?! A deadline needs a /by, e.g. deadline return book /by 2019-10-15");
+            throw new DuckyException("QUACK?! A deadline needs a /by, e.g. deadline return book /by 15-10-2019");
         }
         String description = parts[0].trim();
         String byText = parts[1].trim();
         if (description.isEmpty()) {
             throw new DuckyException("QUACK?! A deadline needs a description, "
-                    + "e.g. deadline return book /by 2019-10-15");
+                    + "e.g. deadline return book /by 15-10-2019");
         }
         if (byText.isEmpty()) {
             throw new DuckyException("QUACK?! A deadline needs a date after /by, "
-                    + "e.g. deadline return book /by 2019-10-15");
+                    + "e.g. deadline return book /by 15-10-2019");
         }
         return new Deadline(description, parseDate(byText));
     }
 
     /**
-     * Parses a date typed by the user in yyyy-mm-dd form (e.g. 2019-10-15).
+     * Parses a date typed by the user in dd-mm-yyyy form (e.g. 15-10-2019).
      *
      * @param dateText The date text typed by the user.
      * @return The date the text describes.
-     * @throws DuckyException If the text is not a valid date in yyyy-mm-dd form.
+     * @throws DuckyException If the text is not a valid date in dd-mm-yyyy form.
      */
     private static LocalDate parseDate(String dateText) throws DuckyException {
         try {
-            // LocalDate.parse expects ISO-8601 (yyyy-mm-dd) and rejects impossible dates like 2019-02-30.
-            return LocalDate.parse(dateText);
+            // Deadline.DATE_FORMAT resolves strictly, so impossible dates like 30-02-2019 are rejected.
+            return LocalDate.parse(dateText, Deadline.DATE_FORMAT);
         } catch (DateTimeParseException e) {
             throw new DuckyException("QUACK?! \"" + dateText + "\" isn't a date I understand. "
-                    + "Use yyyy-mm-dd, e.g. 2019-10-15");
+                    + "Use dd-mm-yyyy, e.g. 15-10-2019");
         }
     }
 

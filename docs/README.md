@@ -39,15 +39,15 @@ Now you have 1 chores in the list.
 
 ### Adding a deadline: `deadline`
 
-A chore that must be done **by** a certain date. Ducky turns the date into a nicer, readable form.
+A chore that must be done **by** a certain date. Ducky checks that the date is a real calendar date, so something like `31-04-2026` is rejected.
 
-Format: `deadline DESCRIPTION /by YYYY-MM-DD`
+Format: `deadline DESCRIPTION /by DD-MM-YYYY`
 
-Example: `deadline return book /by 2026-10-15`
+Example: `deadline return book /by 15-10-2026`
 
 ```
 QUACKDDING! I've added this chore:
-  [D][ ] return book (by: Oct 15 2026)
+  [D][ ] return book (by: 15-10-2026)
 Now you have 2 chores in the list.
 ```
 
@@ -73,7 +73,7 @@ Format: `list`
 
 ```
 [T][ ] 1. read book
-[D][ ] 2. return book (by: Oct 15 2026)
+[D][ ] 2. return book (by: 15-10-2026)
 [E][ ] 3. project meeting (from: Mon 2pm to: 4pm)
 ```
 
@@ -115,7 +115,7 @@ Example: `delete 3`
 [E][ ] 3. project meeting (from: Mon 2pm to: 4pm) waddled away!
 Now chorelist is:
 [T][ ] 1. read book
-[D][ ] 2. return book (by: Oct 15 2026)
+[D][ ] 2. return book (by: 15-10-2026)
 Now you have 2 chores in the list.
 ```
 
@@ -130,7 +130,7 @@ Example: `find book`
 ```
 Here are the matching chores in your list:
 [T][ ] 1. read book
-[D][ ] 2. return book (by: Oct 15 2026)
+[D][ ] 2. return book (by: 15-10-2026)
 ```
 
 ### Exiting: `bai`
@@ -156,7 +156,7 @@ No need to save by hand! Ducky saves your chores every time they change, and loa
 | Command    | Format                                    | Example                                      |
 |------------|-------------------------------------------|----------------------------------------------|
 | To-do      | `todo DESCRIPTION`                        | `todo read book`                             |
-| Deadline   | `deadline DESCRIPTION /by YYYY-MM-DD`     | `deadline return book /by 2026-10-15`        |
+| Deadline   | `deadline DESCRIPTION /by DD-MM-YYYY`     | `deadline return book /by 15-10-2026`        |
 | Event      | `event DESCRIPTION /from START /to END`   | `event project meeting /from Mon 2pm /to 4pm`|
 | List       | `list`                                    | `list`                                       |
 | Mark       | `mark INDEX`                              | `mark 1`                                     |
