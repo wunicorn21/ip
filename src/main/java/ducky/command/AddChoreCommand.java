@@ -29,7 +29,7 @@ public class AddChoreCommand extends Command {
         chores.add(chore);
         saveChores(chores, storage, ui);
         ui.showMessage("QUACKDDING! I've added this chore:");
-        ui.showMessage("  [" + chore.getTypeIcon() + "][" + chore.getStatusIcon() + "] " + chore.getDescription());
+        ui.showMessage("  " + chore);
         ui.showMessage("Now you have " + chores.size() + " chores in the list.");
     }
 }
