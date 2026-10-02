@@ -51,6 +51,19 @@ public class Chore {
         return description;
     }
 
+    /**
+     * Returns whether this chore's own description contains the given keyword.
+     * Only the text the user typed as the description is searched, not the
+     * date or time details that subclasses append in {@link #getDescription()}.
+     * The match is case-sensitive.
+     *
+     * @param keyword Text to look for.
+     * @return {@code true} if the description contains the keyword.
+     */
+    public boolean hasKeyword(String keyword) {
+        return description.contains(keyword);
+    }
+
     /** Marks this chore as done. */
     public void markAsDone() {
         this.isDone = true;

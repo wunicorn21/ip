@@ -11,6 +11,7 @@ import ducky.command.AddChoreCommand;
 import ducky.command.Command;
 import ducky.command.DeleteCommand;
 import ducky.command.ExitCommand;
+import ducky.command.FindCommand;
 import ducky.command.ListCommand;
 import ducky.command.MarkCommand;
 import ducky.command.UnmarkCommand;
@@ -45,6 +46,8 @@ public class Parser {
             return new UnmarkCommand(parseChoreIndex(input, "unmark"));
         } else if (input.startsWith("delete")) {
             return new DeleteCommand(parseChoreIndex(input, "delete"));
+        } else if (input.startsWith("find")) {
+            return new FindCommand(parseKeyword(input));
         } else if (input.startsWith("todo")) {
             return new AddChoreCommand(parseToDo(input));
         } else if (input.startsWith("deadline")) {
@@ -53,7 +56,7 @@ public class Parser {
             return new AddChoreCommand(parseEvent(input));
         } else {
             throw new DuckyException("QUACK?! I don't know \"" + input + "\". "
-                    + "Try: list, todo, deadline, event, mark, unmark, delete, bai");
+                    + "Try: list, find, todo, deadline, event, mark, unmark, delete, bai");
         }
     }
 
@@ -76,6 +79,21 @@ public class Parser {
         } catch (NumberFormatException e) {
             throw new DuckyException("QUACK?! \"" + rankText + "\" isn't a chore number.");
         }
+    }
+
+    /**
+     * Parses the keyword following a "find" command.
+     *
+     * @param input Full command line entered by the user.
+     * @return The keyword to search chore descriptions for.
+     * @throws DuckyException If the keyword is missing.
+     */
+    private static String parseKeyword(String input) throws DuckyException {
+        String keyword = input.substring("find".length()).trim();
+        if (keyword.isEmpty()) {
+            throw new DuckyException("QUACK?! What should I find? e.g. find book");
+        }
+        return keyword;
     }
 
     /**

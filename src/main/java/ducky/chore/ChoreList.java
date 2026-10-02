@@ -42,6 +42,23 @@ public class ChoreList {
     }
 
     /**
+     * Returns a new list holding every chore whose description contains the
+     * given keyword, in their original order. This list itself is left unchanged.
+     *
+     * @param keyword Text to search for in each chore's description.
+     * @return The matching chores (possibly empty).
+     */
+    public ChoreList find(String keyword) {
+        ChoreList matches = new ChoreList();
+        for (Chore chore : chores) {
+            if (chore.hasKeyword(keyword)) {
+                matches.add(chore);
+            }
+        }
+        return matches;
+    }
+
+    /**
      * Returns how many chores are currently stored.
      *
      * @return The number of chores.
