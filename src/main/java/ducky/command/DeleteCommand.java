@@ -28,10 +28,8 @@ public class DeleteCommand extends Command {
         if (!isValidChoreIndex(choreIndex, chores, ui)) {
             return;
         }
-        int rank = choreIndex + 1;
         Chore deleted = chores.get(choreIndex);
-        String deletedLine = "[" + deleted.getTypeIcon() + "][" + deleted.getStatusIcon() + "] "
-                + rank + ". " + deleted.getDescription();
+        String deletedLine = deleted.toNumberedString(choreIndex + 1);
         chores.remove(choreIndex);
         ui.showMessage(deletedLine + " waddled away!");
         ui.showMessage("Now chorelist is:");

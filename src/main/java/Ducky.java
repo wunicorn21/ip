@@ -55,7 +55,8 @@ public class Ducky {
     /**
      * Loads previously saved chores from disk at startup.
      * If nothing is saved yet, or the save file cannot be read, Ducky starts
-     * with an empty chore list instead of failing.
+     * with an empty chore list instead of failing. If only some lines are
+     * unreadable, the rest are loaded and the user is warned about the others.
      *
      * @return A chore list containing whatever was loaded (possibly empty).
      */
@@ -64,6 +65,11 @@ public class Ducky {
         try {
             for (Chore chore : storage.load()) {
                 loaded.add(chore);
+            }
+            int skippedLineCount = storage.getSkippedLineCount();
+            if (skippedLineCount > 0) {
+                ui.showMessage("QUACK?! Skipped " + skippedLineCount + " unreadable line(s) in the save file. "
+                        + "They will be removed the next time chores are saved.");
             }
         } catch (IOException e) {
             ui.showMessage("QUACK?! Couldn't read saved chores, starting with an empty list: " + e.getMessage());

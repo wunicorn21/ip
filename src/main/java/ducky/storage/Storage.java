@@ -23,8 +23,9 @@ import ducky.chore.ToDo;
  * Loads and saves the chore list to a fixed file on disk, so chores survive
  * between runs of Ducky. The save path is relative to the working directory
  * the JVM is launched from (the project root, when run normally).
- * Only the happy path is handled: a well-formed save file written by this
- * same class, and a data directory that can be created if missing.
+ * Lines in the save file that cannot be read (e.g. after the file was edited
+ * by hand) are skipped rather than stopping Ducky from starting; the number
+ * skipped is available from {@link #getSkippedLineCount()}.
  */
 public class Storage {
     /** Relative path, from the project root, of the save file. */
@@ -47,28 +48,41 @@ public class Storage {
     private static final DateTimeFormatter LEGACY_DATE_FORMAT =
             DateTimeFormatter.ofPattern("MMM d yyyy", Locale.ENGLISH);
 
+    /** Number of unreadable save-file lines skipped by the most recent {@link #load()}. */
+    private int skippedLineCount = 0;
+
     /**
      * Loads the chores previously saved to disk.
      * If the save file does not exist yet (e.g. on the very first run),
-     * an empty list is returned instead of failing.
+     * an empty list is returned instead of failing. Any line that cannot be
+     * read is skipped, so one broken line does not lose every other chore.
      *
      * @return The chores read from disk, or an empty list if none are saved.
      * @throws IOException If the save file exists but cannot be read.
      */
     public List<Chore> load() throws IOException {
         List<Chore> chores = new ArrayList<>();
+        skippedLineCount = 0;
         if (!Files.exists(DATA_FILE_PATH)) {
             return chores;
         }
         for (String line : Files.readAllLines(DATA_FILE_PATH)) {
             try {
                 chores.add(parseChore(line));
-            } catch (DateTimeParseException e) {
-                // Reported as an IOException so the caller handles it like any other unreadable save file.
-                throw new IOException("bad date in saved line \"" + line + "\"", e);
+            } catch (IllegalArgumentException | DateTimeParseException e) {
+                skippedLineCount++;
             }
         }
         return chores;
+    }
+
+    /**
+     * Returns how many unreadable lines the most recent {@link #load()} skipped.
+     *
+     * @return The number of skipped lines (0 if every line was read).
+     */
+    public int getSkippedLineCount() {
+        return skippedLineCount;
     }
 
     /**
@@ -89,15 +103,14 @@ public class Storage {
     }
 
     /**
-     * Renders a chore the same way it appears in "list", minus the leading
-     * rank, since the rank is just the chore's position and need not be
-     * stored.
+     * Renders a chore the same way it appears in "list", minus the rank,
+     * since the rank is just the chore's position and need not be stored.
      *
      * @param chore The chore to render.
      * @return The chore rendered as one save-file line.
      */
     private String formatChore(Chore chore) {
-        return "[" + chore.getTypeIcon() + "][" + chore.getStatusIcon() + "] " + chore.getDescription();
+        return chore.toString();
     }
 
     /**
@@ -106,11 +119,11 @@ public class Storage {
      *
      * @param line One save-file line.
      * @return The chore the line represents.
+     * @throws IllegalArgumentException If the line is not in the expected format.
      * @throws DateTimeParseException If a deadline's saved date cannot be read.
      */
     private Chore parseChore(String line) {
-        Matcher lineMatcher = LINE_PATTERN.matcher(line);
-        lineMatcher.matches();
+        Matcher lineMatcher = matchOrThrow(LINE_PATTERN, line);
         String typeIcon = lineMatcher.group(1);
         boolean isDone = lineMatcher.group(2).equals("X");
         String description = lineMatcher.group(3);
@@ -130,22 +143,41 @@ public class Storage {
      * @param typeIcon Single-letter type icon ("T", "D" or "E").
      * @param description The rendered description, as written by {@link #formatChore}.
      * @return The reconstructed chore.
+     * @throws IllegalArgumentException If the type icon is unknown, or the description is not in
+     *         the format its type expects.
      * @throws DateTimeParseException If a deadline's saved date cannot be read.
      */
     private Chore buildChore(String typeIcon, String description) {
         switch (typeIcon) {
+        case "T":
+            return new ToDo(description);
         case "D":
-            Matcher deadlineMatcher = DEADLINE_PATTERN.matcher(description);
-            deadlineMatcher.matches();
+            Matcher deadlineMatcher = matchOrThrow(DEADLINE_PATTERN, description);
             LocalDate by = parseSavedDate(deadlineMatcher.group(2));
             return new Deadline(deadlineMatcher.group(1), by);
         case "E":
-            Matcher eventMatcher = EVENT_PATTERN.matcher(description);
-            eventMatcher.matches();
+            Matcher eventMatcher = matchOrThrow(EVENT_PATTERN, description);
             return new Event(eventMatcher.group(1), eventMatcher.group(2), eventMatcher.group(3));
         default:
-            return new ToDo(description);
+            throw new IllegalArgumentException("unknown chore type \"" + typeIcon + "\"");
         }
+    }
+
+    /**
+     * Matches the whole of the given text against a pattern, so that its
+     * groups can be read.
+     *
+     * @param pattern The pattern the text should match.
+     * @param text The text to match.
+     * @return A matcher whose groups hold the matched parts of the text.
+     * @throws IllegalArgumentException If the text does not match the pattern.
+     */
+    private Matcher matchOrThrow(Pattern pattern, String text) {
+        Matcher matcher = pattern.matcher(text);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("unreadable saved text \"" + text + "\"");
+        }
+        return matcher;
     }
 
     /**

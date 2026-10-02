@@ -147,7 +147,7 @@ OK BAI. OFF TO BUY SOME LEMONADE
 
 No need to save by hand! Ducky saves your chores every time they change, and loads them again the next time you start it. They're kept in `data/ducky.txt`, in the folder you run Ducky from.
 
-> ⚠️ Editing `data/ducky.txt` yourself isn't recommended. A broken line may confuse Ducky.
+> ⚠️ Editing `data/ducky.txt` yourself isn't recommended. If Ducky finds a line it can't read, it skips that line, tells you how many it skipped, and removes them the next time it saves.
 
 ---
 

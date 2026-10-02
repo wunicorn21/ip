@@ -2,7 +2,6 @@ package ducky.ui;
 
 import java.util.Scanner;
 
-import ducky.chore.Chore;
 import ducky.chore.ChoreList;
 
 /**
@@ -17,10 +16,15 @@ public class Ui {
 
     /**
      * Reads one line of input typed by the user.
+     * If the input has ended (e.g. the user pressed Ctrl+D, or piped-in input
+     * ran out), "bai" is returned so that Ducky exits normally instead of crashing.
      *
      * @return The line the user typed, without the trailing newline.
      */
     public String readCommand() {
+        if (!scanner.hasNextLine()) {
+            return "bai";
+        }
         return scanner.nextLine();
     }
 
@@ -59,9 +63,7 @@ public class Ui {
      */
     public void showChores(ChoreList chores) {
         for (int i = 0; i < chores.size(); i++) {
-            Chore chore = chores.get(i);
-            System.out.println("[" + chore.getTypeIcon() + "]" + "[" + chore.getStatusIcon() + "] "
-                    + (i + 1) + ". " + chore.getDescription());
+            System.out.println(chores.get(i).toNumberedString(i + 1));
         }
     }
 

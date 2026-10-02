@@ -73,4 +73,35 @@ public class Chore {
     public void markAsUndone() {
         this.isDone = false;
     }
+
+    /**
+     * Returns this chore as one line of text, e.g. "[T][X] read book".
+     * This is also the format the chore is saved in, so changing it changes
+     * the save-file format too.
+     *
+     * @return The chore's icons followed by its description.
+     */
+    @Override
+    public String toString() {
+        return getIcons() + " " + getDescription();
+    }
+
+    /**
+     * Returns this chore as one line of a numbered list, e.g. "[T][X] 1. read book".
+     *
+     * @param rank The chore's 1-based position in the list being shown.
+     * @return The chore's icons, then its rank, then its description.
+     */
+    public String toNumberedString(int rank) {
+        return getIcons() + " " + rank + ". " + getDescription();
+    }
+
+    /**
+     * Returns the type and status icons in brackets, e.g. "[T][X]".
+     *
+     * @return The bracketed type and status icons.
+     */
+    private String getIcons() {
+        return "[" + getTypeIcon() + "][" + getStatusIcon() + "]";
+    }
 }
